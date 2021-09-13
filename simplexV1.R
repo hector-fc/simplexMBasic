@@ -1,81 +1,94 @@
+#=========================================
+# file: simplexMB.R 
+#=========================================
+# 
+# https://hector-fc.github.io/
+#
+#=========================================
 
+SimplexMB <- function(A,b,c,iB) { 
+  m <- length(b)
+  n <- length(c)
+  iter <- 0 
+  iV <- seq(1,n)
 
-c <- c(1,1,-4,0,0,0) 
+  while (TRUE) {
 
-A <- rbind(
+    cb <- numeric(n)
+    iN <- setdiff(iV,iB)
+        
+    for(i in iN){
+      y <- solve(A[,iB], A[,i])
+      cb[i] <- c[i] - c[iB]%*%y
+    }
+    
+    ik <- which.min(cb)
+    
+    if (cb[ik] >= 0 ){
+      solOp <- solve(A[,iB],b)
+      valOp <- (-c[iB]%*% solOp)  
+      print("Solution Found !")      
+      #print(solOp)
+      #print(valOp)
+      break
+    } 
+    
+    y <- solve(A[,iB],A[,ik])   
+    depre <- which.max(y) 
+
+    if(y[depre] < 0){
+      print("The problem is unbounded ")
+      break
+
+    } else {
+
+      inp <- which(y>0) 
+      min <- b[inp[1]]/y[inp[1]]
+      for(i in inp){
+        if(b[i]/y[i] <= min+1 ){ 
+          min <- b[i]/y[i]
+          ipivo <- i 
+        }
+      }
+    }
+
+    iB <- union( setdiff(iB, iB[ipivo]), c(ik))
+    iter <- iter + 1 
+
+    if (iter >100){
+      print("More iteration iteration is required")
+      break      
+      }
+
+  }
+
+  return(list(solOp,valOp,iter))  
+}
+
+#=========================================
+#  Exemplo 1  
+#
+
+vc <- c(1,1,-4,0,0,0) 
+
+matA <- rbind(
     c(1,1,2, 1,0,0), 
     c(1,1,-1,0,1,0),
     c(-1,0,1,0,0,1)   
 )
 
-b<- c(9,2,4)
+vb<- c(9,2,4)
   
+iB <- c(4,5,6)
 
-m <- length(b)
-n <- length(c)
+solPL <- SimplexMB(matA,vb,vc,iB) 
+print(paste("Solução Basica: ",solPL[1]))
+print(paste("valor  otimo: ",solPL[2]))
+print(paste("Iteração: ", solPL[3]))
 
-cb <- numeric(n)
-
-iter <- 0 
-iV <- seq(1,n)
-
-iB <- c(3,4,5)
-
-
-while (TRUE) {
-
-  iN <- setdiff(iV,iB)
-  
-  cb <- numeric(n)  
-  for(i in iN){
-    y <- solve(A[,iB], A[,i])
-    cb[i] <- c[i] - c[iB]%*%y
-  }
-  
-  ik <- which.min(cb)
-  
-  if (cb[ik] >= 0 ){
-    print("Solução encontrada")
-    break
-  } 
-  solOp <- solve(A[,iB],b)   
-  print(solOp)
-
-  valOp <- (-c[iB]%*%solOp)  
-  print(paste0('valor: ',valOp))
-
-  y <- solve(A[,iB],A[,ik])   
-  depre <- which.max(y) 
-
-  if(y[depre] < 0){
-    print("O Problema não tem solução")
-    break
-
-  } else {
-
-    inp <- which(y>0) 
-    min <- b[inp[1]]/y[inp[1]]
-    for(i in inp){
-      if(b[i]/y[i] <= min+1 ){ 
-        min <- b[i]/y[i]
-        ipivo <- i 
-      }
-    }
-  }
-
-  print(paste0('ipivo ',ipivo))
-
-  iB <- union( setdiff(iB, iB[ipivo]), c(ik))
-  iter <- iter + 1 
-
-  if (iter >2){break}
-
-}
-
-
-
-
-
+#=========================================
+#  Exemplo 2  
+#
 
 
 
