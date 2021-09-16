@@ -25,8 +25,8 @@ SimplexMB <- function(A,b,c,iB) {
             xs <- numeric(n)
             solOp <- solve(A[,iB],b)
             xs[iB] <-solOp 
-            valOp <- (-c[iB]%*% solOp)  
-            print("Solution Found !")      
+            valOp <- (c[iB]%*% solOp)  
+            print("Solução encontrada !")      
             break
         } 
 
@@ -35,7 +35,7 @@ SimplexMB <- function(A,b,c,iB) {
         depre <- which.max(y) 
 
         if(y[depre] < 0){
-            print("The problem is unbounded ")
+            print("O problema é ilimitado ")
             break
 
         } else {
@@ -54,7 +54,7 @@ SimplexMB <- function(A,b,c,iB) {
         iter <- iter + 1 
 
         if (iter >100){
-            print("More iteration iteration is required")
+            print("Número de iterações permitido")
             break      
         }
 
