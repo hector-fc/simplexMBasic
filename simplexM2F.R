@@ -115,34 +115,3 @@ print("")
 print(paste("valor otimo: ",solPL$valOp))
 sl <- solPL$solB
 print(paste("Solução Basica: ",sl[1],sl[2],sl[3]))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
