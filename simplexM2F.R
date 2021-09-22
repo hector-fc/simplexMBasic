@@ -1,5 +1,5 @@
 ##=========================================
-## file: simplexMB.R 
+## file: simplexM2F.R 
 ##=========================================
 ## 
 ## https://hector-fc.github.io/
@@ -25,7 +25,7 @@ SimplexMB <- function(A,b,c,iB) {
             xs <- numeric(n)
             solOp <- solve(A[,iB],b)
             xs[iB] <-solOp 
-            valOp <- (c[iB]%*% solOp)  
+            valOp <- (c[iB]%*% solOp)[1,1]  
             print("Solução encontrada !")      
             break
         } 
@@ -57,34 +57,64 @@ SimplexMB <- function(A,b,c,iB) {
             print("Número de iterações permitido")
             break      
         }
-
     }
+    return(list(iB,xs,valOp,iter))  
+}
+##=========================================
+##  Metodo  de duas fases 
 
-    return(list(xs,valOp,iter))  
+SimplexM2F <- function(A,b,c){    
+    n <- length(c)
+    m <- length(b)
+    
+    ## Fase I
+    print("Fase I")
+    iB <- seq(n+1,m+n)    
+    auxc <- c(rep(0,n),rep(1,m))
+    auxA <- cbind(A,diag(rep(1,m)))
+    solFI <- SimplexMB(auxA,b,auxc,iB) 
+    names(solFI)<- c("Base","solB","valOp","iter")
+    
+    
+    ## Fase II
+    if(solFI$valOp >0 ){      
+        print("O PL  não tem solução")
+        return(-1)
+    }else{
+        print("Fase II")
+        tB <- is.element(max(solFI$Base), seq(1,n))
+        if(tB){             
+            solFII <- SimplexMB(A,b,c,solFI$Base)
+            names(solFII)<- c("Base","solB","valOp","iter")
+            return(solFII)
+        }
+    }
 }
 
+
 ##=========================================
-##  Exemplo 1  
+##  Exemplo 1
 ##
 
-vc <- c(1,1,-4,0,0,0) 
+print("================================")
+print("Exemplo 1")
+
+vc <- c(4,1,1) 
 matA <- rbind(
-    c(1,1,2, 1,0,0), 
-    c(1,1,-1,0,1,0),
-    c(-1,0,1,0,0,1)   
+    c(2,1,2), 
+    c(3,3,1)
 )
-vb<- c(9,2,4)
+vb <- c(4,3)
 
-iB <- c(4,5,6)
+solPL <- SimplexM2F(matA,vb,vc)
 
-solPL <- SimplexMB(matA,vb,vc,iB)
-print(paste("Solução Basica: ",solPL[1]))
-print(paste("valor  otimo: ",solPL[2]))
-print(paste("Iteração: ", solPL[3]))
+print("================================")
+print(" Solução  ")
+print("")
 
-##=========================================
-##  Exemplo 2  
-##
+print(paste("valor otimo: ",solPL$valOp))
+sl <- solPL$solB
+print(paste("Solução Basica: ",sl[1],sl[2],sl[3]))
 
 
 
